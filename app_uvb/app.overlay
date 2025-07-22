@@ -1,0 +1,27 @@
+/*
+ * Copyright (c) 2025 Nordic Semiconductor ASA
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/ {
+	virtual_uhc0: uhc-virtual {
+		compatible = "zephyr,uhc-virtual";
+		maximum-speed = "full-speed";
+
+
+		virtual_udc0: udc-virtual {
+			compatible = "zephyr,udc-virtual";
+			num-bidir-endpoints = <4>;
+			maximum-speed = "full-speed";
+
+			cdc_acm_uart: cdc-acm-uart {
+				compatible = "zephyr,cdc-acm-uart";
+			};
+		};
+	};
+};
+
+&zephyr_udc0 {
+	status = "disabled";
+};
