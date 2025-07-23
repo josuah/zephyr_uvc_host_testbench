@@ -15,13 +15,9 @@
 			num-bidir-endpoints = <4>;
 			maximum-speed = "full-speed";
 
-			cdc_acm_uart: cdc-acm-uart {
-				compatible = "zephyr,cdc-acm-uart";
+			uvc_device: uvc-device {
+				compatible = "zephyr,uvc-device";
 			};
 		};
 	};
-};
-
-&zephyr_udc0 {
-	status = "disabled";
 };

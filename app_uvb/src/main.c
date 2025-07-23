@@ -8,6 +8,7 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/usb/usbd.h>
 #include <zephyr/usb/usbh.h>
+#include <zephyr/usb/class/usbd_uvc.h>
 
 LOG_MODULE_REGISTER(app_main, LOG_LEVEL_INF);
 
@@ -52,6 +53,9 @@ int app_class_resumed(struct usbh_contex *const uhs_ctx)
 	return 0;
 }
 
+const struct device *const uvc_dev = DEVICE_DT_GET(DT_NODELABEL(uvc_device));
+const struct device *const video_dev = DEVICE_DT_GET(DT_CHOSEN(zephyr_camera));
+
 int main(void)
 {
 	struct usbd_context *app_usbd;
@@ -65,6 +69,8 @@ int main(void)
 	class.suspended = app_class_suspended;
 	class.resumed = app_class_resumed;
 
+	uvc_set_video_dev(uvc_dev, video_dev);
+
 	app_usbd = app_usbd_init_device();
 	if (app_usbd == NULL) {
 		LOG_ERR("Failed to initialize USB Device contexts");
@@ -77,15 +83,15 @@ int main(void)
 		return 0;
 	}
 
-	ret = usbd_enable(app_usbd);
-	if (ret != 0) {
-		LOG_ERR("Failed to enable USB Device");
-		return 0;
-	}
-
 	ret = usbh_enable(app_usbh);
 	if (ret != 0) {
 		LOG_ERR("Failed to enable USB Host");
+		return 0;
+	}
+
+	ret = usbd_enable(app_usbd);
+	if (ret != 0) {
+		LOG_ERR("Failed to enable USB Device");
 		return 0;
 	}
 
