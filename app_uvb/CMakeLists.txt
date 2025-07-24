@@ -6,3 +6,5 @@ find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(app LANGUAGES C)
 
 target_sources(app PRIVATE src/main.c src/usbd.c src/usbh.c)
+
+zephyr_include_directories(${ZEPHYR_BASE}/subsys/usb/host)

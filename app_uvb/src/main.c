@@ -10,46 +10,35 @@
 #include <zephyr/usb/usbh.h>
 #include <zephyr/usb/class/usbd_uvc.h>
 
+#include "usbh_device.h"
+#include "usbh_ch9.h"
+
 LOG_MODULE_REGISTER(app_main, LOG_LEVEL_INF);
 
 #include "app.h"
 
-USBH_DEFINE_CLASS(class);
+#define APP_USBH_CLASS_DESC_MAX_SIZE 512
 
-int app_class_request(struct usbh_contex *const uhs_ctx,
-		struct uhc_transfer *const xfer, int err)
+int usbh_class_init(struct usb_device *udev)
 {
-	LOG_INF("Request completion event handler");
-	return 0;
-}
+	const size_t len = APP_USBH_CLASS_DESC_MAX_SIZE;
+	struct net_buf *buf;
+	int ret;
 
-int app_class_connected(struct usbh_contex *const uhs_ctx)
-{
-	LOG_INF("Device connected handler");
-	return 0;
-}
+	buf = usbh_xfer_buf_alloc(udev, len);
+	if (buf == NULL) {
+    		LOG_ERR("Failed to allocate a host transfer buffer");
+		return -ENOMEM;
+	}
 
-int app_class_removed(struct usbh_contex *const uhs_ctx)
-{
-	LOG_INF("Device removed handler");
-	return 0;
-}
+	ret = usbh_req_desc(udev, USB_DESC_DEVICE, 0, 0, len, buf);
+	if (ret != 0) {
+    		LOG_ERR("Failed to request descriptor");
+		return ret;
+	}
 
-int app_class_rwup(struct usbh_contex *const uhs_ctx)
-{
-	LOG_INF("Bus remote wakeup handler");
-	return 0;
-}
+	LOG_HEXDUMP_INF(buf->data, buf->len, "buf");
 
-int app_class_suspended(struct usbh_contex *const uhs_ctx)
-{
-	LOG_INF("Bus suspended handler");
-	return 0;
-}
-
-int app_class_resumed(struct usbh_contex *const uhs_ctx)
-{
-	LOG_INF("Bus resumed handler");
 	return 0;
 }
 
@@ -62,14 +51,11 @@ int main(void)
 	struct usbh_contex *app_usbh;
 	int ret;
 
-	class.request = app_class_request;
-	class.connected = app_class_connected;
-	class.removed = app_class_removed;
-	class.rwup = app_class_rwup;
-	class.suspended = app_class_suspended;
-	class.resumed = app_class_resumed;
-
 	uvc_set_video_dev(uvc_dev, video_dev);
+
+	/* Enable the virtual USB device and virtual USB host so they can
+	 * communicate together
+	 */
 
 	app_usbd = app_usbd_init_device();
 	if (app_usbd == NULL) {
