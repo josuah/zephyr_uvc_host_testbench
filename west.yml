@@ -1,8 +1,0 @@
-# SPDX-License-Identifier: Apache-2.0
-
-manifest:
-  projects:
-    - name: zephyr
-      url: https://github.com/zephyrproject-rtos/zephyr
-      revision: main
-      import: true

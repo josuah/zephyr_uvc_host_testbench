@@ -1,7 +1,6 @@
-# Zephyr UVC Host Testbench
+# DEPRECATED
 
-This repo is there to experiment with UVC Host support in Zephyr.
+You might be interested in this instead:
 
-## `app_uvb`
+- <https://github.com/zephyrproject-rtos/zephyr/pull/93666>
 
-Uses the USB Virtual Bus to connect the virtual USB host to the virtual USB device together.
